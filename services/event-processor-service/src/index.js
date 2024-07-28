@@ -4,15 +4,25 @@ import {
   DeleteMessageCommand,
 } from '@aws-sdk/client-sqs';
 import ProtectionManager from './lib/protection-manager.js';
+import { proccessEventDomain1 } from './domains/domain1/index.js';
+
+const DOMAIN1 = 'domain1';
+const DOMAIN2 = 'domain2';
+
+const QUEUE_URL = process.env.QUEUE_URL;
+const CURRENT_DOMAIN = process.env.DOMAIN;
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const sqs = new SQSClient();
 
-const QUEUE_URL = process.env.QUEUE_URL_DOMAIN1;
 if (!QUEUE_URL) {
   throw new Error('QUEUE_URL environment variable must be set');
-}
+};
+
+if (!CURRENT_DOMAIN) {
+  throw new Error('DOMAIN environment variable must be set');
+};
 
 const TaskProtection = new ProtectionManager({
   desiredProtectionDurationInMins: 1,
@@ -40,8 +50,8 @@ async function receiveMessage() {
       new ReceiveMessageCommand({
         QueueUrl: QUEUE_URL,
         MaxNumberOfMessages: 1,
-        WaitTimeSeconds: 20, // Wait up to 20 seconds on the SQS server side for messages to arrive
-        VisibilityTimeout: ONE_HOUR_IN_SECONDS, // Reserve received messages for one hour
+        WaitTimeSeconds: 20,
+        VisibilityTimeout: ONE_HOUR_IN_SECONDS,
       })
     );
 
@@ -72,18 +82,15 @@ async function deleteMessage(handle) {
 
 // Do the work for a single message.
 async function processMessage(message) {
-  console.log(`${message.MessageId} - Received`);
 
-  const waitPeriod = Number(message.Body) === NaN ? 1000 : Number(message.Body);
-
-  console.log(`${message.MessageId} - Working for ${waitPeriod} milliseconds`);
-
-  await new Promise(function (done) {
-    setTimeout(done, waitPeriod);
-  });
-
-  await deleteMessage(message.ReceiptHandle);
-  console.log(`${message.MessageId} - Done`);
+  switch (CURRENT_DOMAIN) {
+    case DOMAIN1:
+      return proccessEventDomain1(message, deleteMessage);
+    case DOMAIN2:
+      return processMessageForExample2(message);
+    default:
+      console.error('Unknown domain', DOMAIN);
+  }
 }
 
 // Acquire task protection, grab a message, and then release protection
