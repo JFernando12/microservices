@@ -21,19 +21,21 @@ if (!CURRENT_DOMAIN) {
 
 let timeToQuit = false;
 
-function maybeContinuePolling() {
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const maybeContinuePolling = () => {
   if (timeToQuit) {
     console.log('Exiting as requested');
     process.exit(0);
-  } else {
-    setImmediate(pollForWork);
   }
+    
+  setImmediate(pollForWork);
 }
 
-// Acquire task protection, grab a message, and then release protection
-async function pollForWork() {
+const pollForWork = async () => {
   await TaskProtection.acquire();
   await processEvents(CURRENT_DOMAIN, QUEUE_URL);
+  await delay(5000);
   await TaskProtection.release();
   return maybeContinuePolling();
 }

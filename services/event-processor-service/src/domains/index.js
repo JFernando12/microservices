@@ -35,15 +35,15 @@ export const processEvents = async (currentDomain, queueUrl) => {
   const receiveMessageResponse = await sqs.send(
     new ReceiveMessageCommand({
       QueueUrl: queueUrl,
-      MaxNumberOfMessages: 1,
-      WaitTimeSeconds: 20,
-      VisibilityTimeout: ONE_HOUR_IN_SECONDS,
+      MaxNumberOfMessages: domain.MaxNumberOfMessages,
+      WaitTimeSeconds: domain.WaitTimeSeconds,
+      VisibilityTimeout: domain.VisibilityTimeout,
     })
   );
 
   const messages = receiveMessageResponse.Messages;
 
-  if (messages?.length === 0) {
+  if (!messages || messages?.length === 0) {
     console.log('No messages available');
     return;
   }
