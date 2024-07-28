@@ -1,4 +1,4 @@
-import { processEvents } from "./domains";
+import { processEvents } from "./domains/index.js";
 import ProtectionManager from './lib/protection-manager.js';
 
 const QUEUE_URL = process.env.QUEUE_URL;
@@ -33,6 +33,8 @@ const maybeContinuePolling = () => {
 }
 
 const pollForWork = async () => {
+  console.log('Current domain:', CURRENT_DOMAIN);
+  console.log('Queue URL:', QUEUE_URL);
   await TaskProtection.acquire();
   await processEvents(CURRENT_DOMAIN, QUEUE_URL);
   await delay(5000);

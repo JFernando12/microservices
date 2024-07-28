@@ -6,7 +6,7 @@ import {
 import { processEventDomain1 } from './domain1/index.js';
 import { processEventDomain2 } from './domain2/index.js';
 
-const sqs = new SQSClient();
+const sqs = new SQSClient({ region: 'us-east-1'});
 
 const domainsConfig = [
   {
@@ -18,8 +18,8 @@ const domainsConfig = [
   },
   {
     domain: 'domain2',
-    MaxNumberOfMessages: 10,
-    WaitTimeSeconds: 10,
+    MaxNumberOfMessages: 5,
+    WaitTimeSeconds: 20,
     VisibilityTimeout: 60 * 60,
     fn: processEventDomain2,
   },
@@ -38,10 +38,14 @@ export const processEvents = async (currentDomain, queueUrl) => {
       MaxNumberOfMessages: domain.MaxNumberOfMessages,
       WaitTimeSeconds: domain.WaitTimeSeconds,
       VisibilityTimeout: domain.VisibilityTimeout,
+      MessageAttributeNames: ['All'],
+      MessageSystemAttributeNames: ['All'],
     })
   );
+  console.log('Receive message response: ', receiveMessageResponse);
 
   const messages = receiveMessageResponse.Messages;
+  console.log('Messages: ', messages);
 
   if (!messages || messages?.length === 0) {
     console.log('No messages available');

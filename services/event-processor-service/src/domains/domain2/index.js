@@ -1,5 +1,5 @@
 export const processEventDomain2 = async (message) => {
-  console.log('Domain 2 processing message:', message.Message);
+  console.log('Domain 2 processing message:', message);
   
   const waitPeriod = Number(message.Body) === NaN ? 1000 : Number(message.Body);
 
