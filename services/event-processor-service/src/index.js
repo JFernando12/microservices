@@ -1,5 +1,15 @@
+import { processEvents } from "./domains";
+import ProtectionManager from './lib/protection-manager.js';
+
 const QUEUE_URL = process.env.QUEUE_URL;
 const CURRENT_DOMAIN = process.env.DOMAIN;
+
+const TaskProtection = new ProtectionManager({
+  desiredProtectionDurationInMins: 1,
+  maintainProtectionPercentage: 10,
+  refreshProtectionPercentage: 80,
+  protectionAdjustIntervalInMs: 10 * 1000,
+});
 
 if (!QUEUE_URL) {
   throw new Error('QUEUE_URL environment variable must be set');
@@ -22,7 +32,9 @@ function maybeContinuePolling() {
 
 // Acquire task protection, grab a message, and then release protection
 async function pollForWork() {
-
+  await TaskProtection.acquire();
+  await processEvents(CURRENT_DOMAIN, QUEUE_URL);
+  await TaskProtection.release();
   return maybeContinuePolling();
 }
 
