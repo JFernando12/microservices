@@ -4,11 +4,42 @@ import { Construct } from 'constructs';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
-import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
 
 interface QueueFargateServiceProps {
   cluster: ecs.Cluster;
   containerImage: cdk.aws_ecs.ContainerImage;
+
+  /**
+   * A boolean that indicates whether to create a FIFO queue.
+   * @default false
+   */
+  fifo?: boolean;
+
+  /**
+   * A boolean that indicates whether to enable content-based deduplication.
+   * @default undefined
+   */
+  contentBasedDeduplication?: boolean;
+
+  /**
+   * The duration (in seconds) that the received messages are hidden from subsequent
+   * retrieve requests after being retrieved by a ReceiveMessage request.
+   * @default cdk.Duration.seconds(300)
+   */
+  visibilityTimeout?: cdk.Duration;
+
+  /**
+   * The number of seconds for which Amazon SQS retains a message.
+   * @default cdk.Duration.days(4)
+   */
+  retentionPeriod?: cdk.Duration;
+
+  /**
+   * The duration (in seconds) for which the call waits for a message to arrive in the queue
+   * before returning. If a message is available, the call returns sooner than WaitTimeSeconds.
+   * @default cdk.Duration.seconds(0)
+   */
+  receiveMessageWaitTime?: cdk.Duration;
 
   /**
    * The desired count of runnig tasks.
@@ -51,6 +82,11 @@ export class QueueFargateService extends Construct {
     const {
       cluster,
       containerImage,
+      fifo,
+      contentBasedDeduplication,
+      visibilityTimeout,
+      retentionPeriod,
+      receiveMessageWaitTime,
       desiredCount,
       minCapacity,
       maxCapacity,
@@ -59,7 +95,7 @@ export class QueueFargateService extends Construct {
     } = props;
 
     const queueId = `${id}-queueId`;
-    const queueName = `${id}-queue.fifo`;
+    const queueName = `${id}-queue`;
     const taskDefinitionId = `${id}-taskDefinition`;
     const containerId = `${id}-container`;
     const fargateServiceId = `${id}-fargateService`;
@@ -67,12 +103,12 @@ export class QueueFargateService extends Construct {
 
     // SQS Queues
     const queue = new sqs.Queue(this, queueId, {
-      contentBasedDeduplication: true,
-      fifo: true,
-      queueName: queueName,
-      visibilityTimeout: cdk.Duration.seconds(300),
-      retentionPeriod: cdk.Duration.days(14),
-      receiveMessageWaitTime: cdk.Duration.seconds(20),
+      fifo: fifo ? true : undefined,
+      contentBasedDeduplication: contentBasedDeduplication || undefined,
+      queueName: fifo ? `${queueName}.fifo` : queueName,
+      visibilityTimeout: visibilityTimeout || cdk.Duration.seconds(300),
+      retentionPeriod: retentionPeriod || cdk.Duration.days(4),
+      receiveMessageWaitTime: receiveMessageWaitTime || cdk.Duration.seconds(0),
     });
 
     // ECS Fargate Task Definition
