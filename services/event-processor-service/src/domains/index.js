@@ -38,8 +38,6 @@ export const processEvents = async (currentDomain, queueUrl) => {
       MaxNumberOfMessages: domain.MaxNumberOfMessages,
       WaitTimeSeconds: domain.WaitTimeSeconds,
       VisibilityTimeout: domain.VisibilityTimeout,
-      MessageAttributeNames: ['All'],
-      MessageSystemAttributeNames: ['All'],
     })
   );
   console.log('Receive message response: ', receiveMessageResponse);
