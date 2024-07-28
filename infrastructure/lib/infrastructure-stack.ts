@@ -4,10 +4,7 @@ import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as ecs from "aws-cdk-lib/aws-ecs";
-import * as ecr from "aws-cdk-lib/aws-ecr";
-import * as ecs_patterns from "aws-cdk-lib/aws-ecs-patterns";
-import * as app_autoscaling from "aws-cdk-lib/aws-applicationautoscaling";
-import { ApplicationScalingAction } from 'aws-cdk-lib/aws-cloudwatch-actions';
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 export class InfrastructureStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -35,56 +32,56 @@ export class InfrastructureStack extends cdk.Stack {
       }
     );
 
-    const fargate_service1 = new ecs_patterns.QueueProcessingFargateService(this, 'EventQueueService', {
-      cluster,
-      queue: queueDomain1,
-      memoryLimitMiB: 512,
-      cpu: 256,
+    const taskDefinition = new ecs.FargateTaskDefinition(
+      this,
+      'QueueProcessingTaskDef',
+      {
+        memoryLimitMiB: 512,
+        cpu: 256,
+      }
+    );
+
+    taskDefinition.addContainer('QueueProcessingContainer', {
       image: ecs.ContainerImage.fromAsset('../services/event-procesor-service'),
       environment: {
         QUEUE_URL_DOMAIN1: queueDomain1.queueUrl,
       },
-      minScalingCapacity: 0,
-      maxScalingCapacity: 3,
-      scalingSteps: [
-        { change: 0, upper: 0 },
-        { lower: 1, change: 1 },
-      ],
+      logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'QueueProcessing' }),
     });
 
-    const fargate_service_cpu_metric = fargate_service1.service.metricCpuUtilization(
-      {
-        period: cdk.Duration.minutes(3),
-        statistic: 'Average'
-      }
-    );
+    taskDefinition.taskRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      actions: ['ecs:UpdateTaskProtection'],
+      resources: ['*'], // You can scope this down to the specific resource if needed
+    }));
 
-    const scale_in_init = fargate_service_cpu_metric.createAlarm(this, 'ScaleInAlarm',
-      {
-        alarmDescription: 'Scale in if CPU utilization is less than 10%',
-        alarmName: 'ScaleInAlarm',
-        evaluationPeriods: 1,
-        threshold: 0.01,
-        actionsEnabled: true,
-        datapointsToAlarm: 1,
-      }
-    );
-
-    const scaling_target = app_autoscaling.ScalableTarget.fromScalableTargetId(
-      this, 
-      'ScalableTarget',
-      `service/${fargate_service1.cluster.clusterName}/${fargate_service1.service.serviceName}|ecs:service:DesiredCount|ecs`
-    );
-
-    const scaling_action = new app_autoscaling.StepScalingAction(
+    const fargateService = new ecs.FargateService(
       this,
-      'scaleToZero',
+      'QueueProcessingFargateService',
       {
-        scalingTarget: scaling_target,
-        adjustmentType: app_autoscaling.AdjustmentType.EXACT_CAPACITY,
+        cluster: cluster,
+        taskDefinition: taskDefinition,
+        desiredCount: 0,
+        assignPublicIp: true,
       }
     );
 
-    scale_in_init.addAlarmAction(new ApplicationScalingAction(scaling_action));
+    queueDomain1.grantConsumeMessages(fargateService.taskDefinition.taskRole);
+
+    // Define the auto-scaling policy
+    const scaling = fargateService.autoScaleTaskCount({
+      minCapacity: 0,
+      maxCapacity: 2,
+    });
+
+    // Set the adjustment type
+    scaling.scaleOnMetric('MetricScaling', {
+      metric: queueDomain1.metricApproximateNumberOfMessagesVisible(),
+      adjustmentType: cdk.aws_applicationautoscaling.AdjustmentType.EXACT_CAPACITY,
+      scalingSteps: [
+        { upper: 0, change: 0 },
+        { lower: 1, upper: 10, change: 1 },
+        { lower: 10, change: 2 },
+      ],
+    });
   }
 }

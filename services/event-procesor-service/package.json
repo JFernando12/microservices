@@ -2,11 +2,17 @@
   "name": "event-procesor-service",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "@aws-sdk/client-sqs": "^3.620.0",
+    "aws-sdk": "^2.1664.0",
+    "got": "^14.4.2"
+  }
 }
