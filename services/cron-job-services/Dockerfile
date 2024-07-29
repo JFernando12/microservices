@@ -6,8 +6,7 @@ WORKDIR /usr/src/app
 
 # Copy the JavaScript file to the container
 COPY src/ ./src/
-COPY package.json ./
-COPY package-lock.json ./
+COPY package*.json ./
 
 # Install the dependencies
 RUN npm install

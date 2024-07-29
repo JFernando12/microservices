@@ -10,6 +10,18 @@ interface QueueFargateServiceProps {
   containerImage: cdk.aws_ecs.ContainerImage;
 
   /**
+   * The number of CPU units used by the task.
+   * @default 256
+   */
+  cpu?: number;
+
+  /**
+   * The amount (in MiB) of memory used by the task.
+   * @default 512
+   */
+  memoryLimitMiB?: number;
+
+  /**
    * A boolean that indicates whether to create a FIFO queue.
    * @default false
    */
@@ -82,6 +94,8 @@ export class QueueFargateService extends Construct {
     const {
       cluster,
       containerImage,
+      cpu,
+      memoryLimitMiB,
       fifo,
       contentBasedDeduplication,
       visibilityTimeout,
@@ -116,8 +130,8 @@ export class QueueFargateService extends Construct {
       this,
       taskDefinitionId,
       {
-        memoryLimitMiB: 512,
-        cpu: 256,
+        memoryLimitMiB: memoryLimitMiB || 512,
+        cpu: cpu || 256,
       }
     );
 
