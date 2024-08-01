@@ -1,0 +1,46 @@
+service: event-processor
+
+provider:
+  name: aws
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+
+functions:
+  domain7:
+    runtime: nodejs20.x
+    handler: ./src/domain7/index.handler
+    events:
+      - sqs:
+          arn: !GetAtt Domain7Queue.Arn
+          batchSize: 1
+
+plugins:
+  - serverless-offline
+
+resources:
+  Resources:
+    Domain7Queue:
+      Type: AWS::SQS::Queue
+      DeletionPolicy: Delete
+      UpdateReplacePolicy: Delete
+      Properties:
+        VisibilityTimeout: 180
+        MessageRetentionPeriod: 3600
+
+    Domain7QueuePolicy:
+      Type: AWS::SQS::QueuePolicy
+      Properties:
+        Queues:
+          - !Ref Domain7Queue
+        PolicyDocument:
+          Version: "2012-10-17"
+          Id: SecureTransportPolicy
+          Statement:
+            - Sid: AllowSecureTransportOnly
+              Effect: Deny
+              Principal: "*"
+              Action: "SQS:*"
+              Resource: "*"
+              Condition:
+                Bool:
+                  aws:SecureTransport: false

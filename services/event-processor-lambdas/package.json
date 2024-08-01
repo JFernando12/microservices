@@ -1,0 +1,16 @@
+{
+  "name": "cron-job-lambdas",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.142",
+    "serverless-offline": "^13.6.0"
+  }
+}

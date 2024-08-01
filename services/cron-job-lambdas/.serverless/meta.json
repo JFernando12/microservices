@@ -1,0 +1,157 @@
+{
+  "C:\\Users\\ferna\\Documents\\ggtech\\microservices\\services\\cron-job-lambdas": {
+    "versionSfCore": null,
+    "versionFramework": "4.1.18",
+    "isWithinCompose": false,
+    "isCompose": false,
+    "composeOrgName": null,
+    "composeResolverProviders": {
+      "opt": {
+        "instance": {
+          "credentials": "<REDACTED>",
+          "serviceConfigFile": {
+            "service": "Microservices",
+            "provider": {
+              "name": "aws",
+              "stage": "dev",
+              "region": "us-east-1",
+              "versionFunctions": true
+            },
+            "functions": {
+              "domain5": {
+                "runtime": "nodejs20.x",
+                "handler": "./src/domains/domain5/index.handler",
+                "events": [
+                  {
+                    "schedule": "rate(24 hours)"
+                  }
+                ],
+                "name": "Microservices-dev-domain5"
+              }
+            },
+            "plugins": [
+              "serverless-offline"
+            ]
+          },
+          "configFileDirPath": "C:\\Users\\ferna\\Documents\\ggtech\\microservices\\services\\cron-job-lambdas",
+          "config": {
+            "type": "opt"
+          },
+          "options": {}
+        },
+        "resolvers": {}
+      },
+      "aws": {
+        "instance": {
+          "credentials": "<REDACTED>",
+          "serviceConfigFile": {
+            "service": "Microservices",
+            "provider": {
+              "name": "aws",
+              "stage": "dev",
+              "region": "us-east-1",
+              "versionFunctions": true
+            },
+            "functions": {
+              "domain5": {
+                "runtime": "nodejs20.x",
+                "handler": "./src/domains/domain5/index.handler",
+                "events": [
+                  {
+                    "schedule": "rate(24 hours)"
+                  }
+                ],
+                "name": "Microservices-dev-domain5"
+              }
+            },
+            "plugins": [
+              "serverless-offline"
+            ]
+          },
+          "configFileDirPath": "C:\\Users\\ferna\\Documents\\ggtech\\microservices\\services\\cron-job-lambdas",
+          "config": {
+            "type": "aws"
+          },
+          "options": {},
+          "stage": "dev",
+          "dashboard": null,
+          "isDefaultConfig": true
+        },
+        "resolvers": {}
+      }
+    },
+    "composeServiceName": null,
+    "servicePath": "C:\\Users\\ferna\\Documents\\ggtech\\microservices\\services\\cron-job-lambdas",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "service": "Microservices",
+      "provider": {
+        "name": "aws",
+        "stage": "dev",
+        "region": "us-east-1",
+        "versionFunctions": true
+      },
+      "functions": {
+        "domain5": {
+          "runtime": "nodejs20.x",
+          "handler": "./src/domains/domain5/index.handler",
+          "events": [
+            {
+              "schedule": "rate(24 hours)"
+            }
+          ],
+          "name": "Microservices-dev-domain5"
+        }
+      },
+      "plugins": [
+        "serverless-offline"
+      ]
+    },
+    "serviceRawFile": "service: Microservices\r\n\r\nprovider:\r\n  name: aws\r\n  stage: ${opt:stage, 'dev'}\r\n  region: us-east-1\r\n\r\nfunctions:\r\n  domain5:\r\n    runtime: nodejs20.x\r\n    handler: ./src/domains/domain5/index.handler\r\n    events:\r\n      - schedule: rate(24 hours)\r\n\r\nplugins:\r\n  - serverless-offline\r\n",
+    "command": [
+      "remove"
+    ],
+    "options": {},
+    "error": null,
+    "params": {},
+    "machineId": "1f77b919d1013c62af9bee982617d021",
+    "accessKeyV2": "<REDACTED>",
+    "accessKeyV1": "<REDACTED>",
+    "orgId": "f9ac0a6a-9e98-40f4-8c0c-6ca3920b2f15",
+    "orgName": "jfernando12",
+    "userId": "l545F6hL4ZwSjdwcCX",
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "userName": "jfernando12",
+    "subscription": null,
+    "userEmail": "fernandocastrejonh@gmail.com",
+    "serviceProviderAwsCredentials": "<REDACTED>",
+    "serviceProviderAwsAccountId": "947403101409",
+    "versionSf": "4.1.18",
+    "serviceProviderAwsCfStackName": "Microservices-dev",
+    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:947403101409:stack/Microservices-dev/e938c040-4f60-11ef-8e71-0e3686513edb",
+    "serviceProviderAwsCfStackCreated": "2024-07-31T17:18:32.066Z",
+    "serviceProviderAwsCfStackUpdated": "2024-07-31T17:56:38.972Z",
+    "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
+    "serviceProviderAwsCfStackOutputs": [
+      {
+        "OutputKey": "Domain5LambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:us-east-1:947403101409:function:Microservices-dev-domain5:3",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-Microservices-dev-Domain5LambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "ServerlessDeploymentBucketName",
+        "OutputValue": "microservices-dev-serverlessdeploymentbucket-z91yinsgdu6r",
+        "ExportName": "sls-Microservices-dev-ServerlessDeploymentBucketName"
+      }
+    ]
+  }
+}

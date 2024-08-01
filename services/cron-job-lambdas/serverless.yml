@@ -1,0 +1,16 @@
+service: cron-jobs
+
+provider:
+  name: aws
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+
+functions:
+  domain5:
+    runtime: nodejs20.x
+    handler: ./src/domains/domain5/index.handler
+    events:
+      - schedule: rate(24 hours)
+
+plugins:
+  - serverless-offline
