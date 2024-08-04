@@ -52,13 +52,13 @@ export const processEvents = async (currentDomain, queueUrl) => {
   console.log('Received messages:', messages.length);
 
   const promises = messages.map((message) => {
-    return processMessage(domain.fn, message);
+    return processMessage(domain.fn, message, queueUrl);
   });
 
   await Promise.all(promises);  
 }
 
-const processMessage = async (fn, message) => {
+const processMessage = async (fn, message, queueUrl) => {
   console.log(`${message.MessageId} - Received`);
 
   try {

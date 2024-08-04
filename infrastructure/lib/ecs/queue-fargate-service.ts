@@ -110,6 +110,8 @@ export class QueueFargateService extends Construct {
 
     const queueId = `${id}-queueId`;
     const queueName = `${id}-queue`;
+    const exportQueueUrl = `${id}-queueUrl`;
+    const exportQueueArn = `${id}-queueArn`;
     const taskDefinitionId = `${id}-taskDefinition`;
     const containerId = `${id}-container`;
     const fargateServiceId = `${id}-fargateService`;
@@ -123,6 +125,18 @@ export class QueueFargateService extends Construct {
       visibilityTimeout: visibilityTimeout || cdk.Duration.seconds(300),
       retentionPeriod: retentionPeriod || cdk.Duration.days(4),
       receiveMessageWaitTime: receiveMessageWaitTime || cdk.Duration.seconds(0),
+    });
+
+    // Export the queue URL
+    new cdk.CfnOutput(this, exportQueueUrl, {
+      value: queue.queueUrl,
+      exportName: exportQueueUrl,
+    });
+
+    // Export the queue ARN
+    new cdk.CfnOutput(this, exportQueueArn, {
+      value: queue.queueArn,
+      exportName: exportQueueArn,
     });
 
     // ECS Fargate Task Definition

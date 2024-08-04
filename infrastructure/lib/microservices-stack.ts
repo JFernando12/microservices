@@ -32,26 +32,26 @@ export class MicroservicesStack extends cdk.Stack {
       containerImage: eventProcessorImage,
     });
 
-    // Create domain2 queue service
-    new QueueFargateService(this, 'domain2', {
-      cluster,
-      containerImage: eventProcessorImage,
-    });
+    // // Create domain2 queue service
+    // new QueueFargateService(this, 'domain2', {
+    //   cluster,
+    //   containerImage: eventProcessorImage,
+    // });
 
-    // Create domain3 cron service
-    new CronFargateTask(this, 'domain3', {
-      cluster,
-      containerImage: cronJobImage,
-      expression: 'rate(1 minute)',
-      enabled: false,
-    });
+    // // Create domain3 cron service
+    // new CronFargateTask(this, 'domain3', {
+    //   cluster,
+    //   containerImage: cronJobImage,
+    //   expression: 'rate(1 minute)',
+    //   enabled: false,
+    // });
 
-    // Create domain4 cron service
-    new CronFargateTask(this, 'domain4', {
-      cluster,
-      containerImage: cronJobImage,
-      expression: 'rate(5 minutes)',
-      enabled: false,
-    });
+    // // Create domain4 cron service
+    // new CronFargateTask(this, 'domain4', {
+    //   cluster,
+    //   containerImage: cronJobImage,
+    //   expression: 'rate(5 minutes)',
+    //   enabled: false,
+    // });
   }
 }
