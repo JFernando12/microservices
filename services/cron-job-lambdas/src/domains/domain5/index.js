@@ -61,7 +61,7 @@ const sendIdsInBatchesToSqs = async (sqsClient, queueUrl, ids) =>{
     const messageBody = JSON.stringify({ id });
     
     // Check if adding this message would exceed the batch size or message size
-    if (batch.length >= maxBatchSize || (batch.length > 0 && Buffer.byteLength(messageBody) + Buffer.byteLength(batch.map(msg => msg.MessageBody).join('')) > maxMessageSize)) {
+    if (batch.length >= maxBatchSize || (batch.length > 0 && Buffer.byteLength(messageBody) + Buffer.byteLength(batch.join('')) > maxMessageSize)) {
       // Send the current batch
       await sendBatchToSqs(sqsClient, queueUrl, batch);
       batch = [];
