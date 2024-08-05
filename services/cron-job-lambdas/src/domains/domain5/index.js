@@ -1,18 +1,17 @@
 import { MongoClient } from 'mongodb';
-import { SQSClient, SendMessageBatchCommand } from '@aws-sdk/client-sqs';
+import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
+import axios from 'axios';
 
 console.log('Starting Domain 5 cron job...');
 console.log('Processing IDs...');
 
 const QUEUE_URL = process.env.QUEUE_URL;
-
-console.log('Queue URL:', QUEUE_URL);
+const MONGO_URI = process.env.MONGO_URI;
+const RIOT_API_KEY = process.env.RIOT_API_KEY
+const RIOT_API_URL = process.env.RIOT_API_URL;
 
 export const handler = async () => {
-  const ids = Array.from({ length: 8 }, (_, i) => `id${i + 1}`); // Replace with your array of IDs
-
-  const mongoUri = '';
-  const client = new MongoClient(mongoUri,  {});
+  const client = new MongoClient(MONGO_URI,  {});
 
   // AWS SQS setup
   const sqsClient = new SQSClient({ region: 'us-east-1' });
@@ -20,12 +19,16 @@ export const handler = async () => {
   try {
     // Connect to MongoDB
     await client.connect();
-    const database = client.db('your_database_name');
-    const collection = database.collection('your_collection_name');
+    const database = client.db('test');
+    const collection = database.collection('matchToProcess');
+
+    // Get IDs to process
+    const ids = await getIdsToProcess();
+    console.log('IDs to process:', ids);
 
     // Step 1: Find non-existing IDs
-    const existingDocs = await collection.find({ _id: { $in: ids } }).project({ _id: 1 }).toArray();
-    const existingIds = existingDocs.map(doc => doc._id);
+    const existingDocs = await collection.find({ matchId: { $in: ids } }).project({ matchId: 1 }).toArray();
+    const existingIds = existingDocs.map(doc => doc.matchId);
     const nonExistingIds = ids.filter(id => !existingIds.includes(id));
 
     if (nonExistingIds.length === 0) {
@@ -34,7 +37,7 @@ export const handler = async () => {
     }
     
     // Step 2: Insert new IDs into MongoDB
-    const newDocs = nonExistingIds.map(id => ({ _id: id }));
+    const newDocs = nonExistingIds.map(id => ({ matchId: id, processed: false, needToProcess: true }));
     await collection.insertMany(newDocs);
     console.log('Inserted new IDs into MongoDB:', nonExistingIds);
 
@@ -49,7 +52,7 @@ export const handler = async () => {
   }
 }
 
-async function sendIdsInBatchesToSqs(sqsClient, queueUrl, ids) {
+const sendIdsInBatchesToSqs = async (sqsClient, queueUrl, ids) =>{
   const maxBatchSize = 10; // SQS maximum batch size
   const maxMessageSize = 256 * 1024; // SQS maximum message size in bytes
   let batch = [];
@@ -64,10 +67,7 @@ async function sendIdsInBatchesToSqs(sqsClient, queueUrl, ids) {
       batch = [];
     }
 
-    batch.push({
-      Id: id,
-      MessageBody: messageBody,
-    });
+    batch.push(id);
   }
 
   // Send any remaining messages
@@ -76,21 +76,21 @@ async function sendIdsInBatchesToSqs(sqsClient, queueUrl, ids) {
   }
 }
 
-async function sendBatchToSqs(sqsClient, queueUrl, batch) {
+const sendBatchToSqs = async (sqsClient, queueUrl, batch) => {
   const params = {
     QueueUrl: queueUrl,
-    Entries: batch,
+    MessageBody: JSON.stringify(batch),
   };
 
   const maxRetries = 3;
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const command = new SendMessageBatchCommand(params);
+      const command = new SendMessageCommand(params);
       const result = await sqsClient.send(command);
       if (result.Failed?.length > 0) {
         throw new Error('Failed to send some messages to SQS');
       }
-      console.log('Sent messages to AWS SQS:', batch.map(msg => msg.Id));
+      console.log('Sent messages to AWS SQS:', batch);
       break;
     } catch (error) {
       console.error(`Attempt ${attempt} - Error sending messages to SQS:`, error);
@@ -101,4 +101,18 @@ async function sendBatchToSqs(sqsClient, queueUrl, batch) {
       }
     }
   }
+}
+
+const getIdsToProcess = async () => {
+  const response = await axios.get(RIOT_API_URL, {
+    headers: {
+      'X-Riot-Token': RIOT_API_KEY,
+    },
+  });
+
+  if (response.status !== 200) {
+    throw new Error('Failed to fetch IDs to process');
+  }
+
+  return response.data.matchIds;
 }

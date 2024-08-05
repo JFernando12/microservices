@@ -40,7 +40,6 @@ export const processEvents = async (currentDomain, queueUrl) => {
       VisibilityTimeout: domain.VisibilityTimeout,
     })
   );
-  console.log('Receive message response: ', receiveMessageResponse);
 
   const messages = receiveMessageResponse.Messages;
   console.log('Messages: ', messages);
@@ -61,8 +60,10 @@ export const processEvents = async (currentDomain, queueUrl) => {
 const processMessage = async (fn, message, queueUrl) => {
   console.log(`${message.MessageId} - Received`);
 
+  const body = JSON.parse(message.Body);
+
   try {
-    await fn(message);
+    await fn(body);
 
     await sqs.send(
       new DeleteMessageCommand({

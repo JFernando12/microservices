@@ -1,9 +1,9 @@
 export const processEventDomain1 = async (message) => {
   console.log('Domain 2 processing message:', message);
 
-  const waitPeriod = Number(message.Body) === NaN ? 1000 : Number(message.Body);
+  const waitPeriod = Number(message) === NaN ? 1000 : Number(message);
 
-  console.log(`${message.MessageId} - Working for ${waitPeriod} milliseconds`);
+  console.log(`${message} - Working for ${waitPeriod} milliseconds`);
 
   await new Promise(function (done) {
     setTimeout(done, waitPeriod);

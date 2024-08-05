@@ -14,12 +14,16 @@ provider:
 functions:
   domain5:
     runtime: nodejs20.x
+    timeout: 29
     handler: ./src/domains/domain5/index.handler
     events:
-      - schedule: rate(3 minutes)
+      - schedule: rate(5 minutes)
     environment:
       QUEUE_URL:
         Fn::ImportValue: domain1-queueUrl
+      MONGO_URI: ${env:MONGO_URI}
+      RIOT_API_URL: ${env:RIOT_API_URL}
+      RIOT_API_KEY: ${env:RIOT_API_KEY}
 
 plugins:
   - serverless-offline
