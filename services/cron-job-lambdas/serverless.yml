@@ -17,7 +17,7 @@ functions:
     timeout: 29
     handler: ./src/domains/domain5/index.handler
     events:
-      - schedule: rate(5 minutes)
+      - schedule: rate(3 minutes)
     environment:
       QUEUE_URL:
         Fn::ImportValue: domain1-queueUrl

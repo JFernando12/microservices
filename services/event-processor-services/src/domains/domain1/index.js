@@ -1,13 +1,32 @@
-export const processEventDomain1 = async (message) => {
-  console.log('Domain 2 processing message:', message);
+export const processEventDomain1 = async (data) => {
+  const ids = data;
 
-  const waitPeriod = Number(message) === NaN ? 1000 : Number(message);
+  const promises = ids.map(id => processMatch(id));
 
-  console.log(`${message} - Working for ${waitPeriod} milliseconds`);
+  await Promise.all(promises);
+}
 
-  await new Promise(function (done) {
-    setTimeout(done, waitPeriod);
+const processMatch = async (id) => {
+  const match = await getMatch(id);
+
+  console.log('Match:', match);
+}
+
+const getMatch = async (id) => {
+  const RIOT_API_URL = process.env.RIOT_API_URL;
+  const RIOT_API_KEY = process.env.RIOT_API_KEY;
+  console.log('riot_api_url:', RIOT_API_URL);
+  console.log('riot_api_key:', RIOT_API_KEY);
+  
+  const response = await axios.get(`${RIOT_API_URL}/val/match/console/v1/matches/${id}`, {
+    headers: {
+      'X-Riot-Token': RIOT_API_KEY,
+    },
   });
 
-  console.log(`${message.MessageId} - Done`);
+  if (response.status !== 200) {
+    throw new Error(`Failed to fetch match ${id}`);
+  }
+
+  return response.data;
 }
