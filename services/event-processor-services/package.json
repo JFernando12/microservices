@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node --env-file=.env src/index.js"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +13,8 @@
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.620.0",
     "aws-sdk": "^2.1664.0",
-    "got": "^14.4.2"
+    "axios": "^1.7.3",
+    "got": "^14.4.2",
+    "mongodb": "^6.8.0"
   }
 }

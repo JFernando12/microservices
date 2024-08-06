@@ -15,4 +15,4 @@ COPY .env ./
 RUN npm install
 
 # Run the JavaScript file
-CMD ["node", "src/index.js"]
+CMD ["npm", "start"]

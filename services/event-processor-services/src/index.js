@@ -1,6 +1,11 @@
 import { processEvents } from "./domains/index.js";
 import ProtectionManager from './lib/protection-manager.js';
 
+const RIOT_API_URL = process.env.RIOT_API_URL;
+const RIOT_API_KEY = process.env.RIOT_API_KEY;
+console.log('riot_api_url:', RIOT_API_URL);
+console.log('riot_api_key:', RIOT_API_KEY);
+
 const QUEUE_URL = process.env.QUEUE_URL;
 const CURRENT_DOMAIN = process.env.DOMAIN;
 
@@ -34,7 +39,6 @@ const maybeContinuePolling = () => {
 
 const pollForWork = async () => {
   console.log('Current domain:', CURRENT_DOMAIN);
-  console.log('Queue URL:', QUEUE_URL);
   await TaskProtection.acquire();
   await processEvents(CURRENT_DOMAIN, QUEUE_URL);
   await delay(5000);

@@ -42,13 +42,12 @@ export const processEvents = async (currentDomain, queueUrl) => {
   );
 
   const messages = receiveMessageResponse.Messages;
-  console.log('Messages: ', messages);
+  console.log('Received messages:', messages?.length);
 
   if (!messages || messages?.length === 0) {
     console.log('No messages available');
     return;
   }
-  console.log('Received messages:', messages.length);
 
   const promises = messages.map((message) => {
     return processMessage(domain.fn, message, queueUrl);
