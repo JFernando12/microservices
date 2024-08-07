@@ -1,13 +1,7 @@
-import { processEvents } from "./domains/index.js";
-import ProtectionManager from './lib/protection-manager.js';
 
-const RIOT_API_URL = process.env.RIOT_API_URL;
-const RIOT_API_KEY = process.env.RIOT_API_KEY;
-console.log('riot_api_url:', RIOT_API_URL);
-console.log('riot_api_key:', RIOT_API_KEY);
-
-const QUEUE_URL = process.env.QUEUE_URL;
-const CURRENT_DOMAIN = process.env.DOMAIN;
+import ProtectionManager from '../lib/protection-manager.js';
+import { QUEUE_URL, CURRENT_DOMAIN } from "../config/envs.js";
+import { processEvents } from './process-events.js';
 
 const TaskProtection = new ProtectionManager({
   desiredProtectionDurationInMins: 1,
@@ -28,22 +22,22 @@ let timeToQuit = false;
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+export const pollEvents = async () => {
+  console.log('Current domain:', CURRENT_DOMAIN);
+  await TaskProtection.acquire();
+  await processEvents(CURRENT_DOMAIN, QUEUE_URL);
+  await delay(3000);
+  await TaskProtection.release();
+  return maybeContinuePolling();
+}
+
 const maybeContinuePolling = () => {
   if (timeToQuit) {
     console.log('Exiting as requested');
     process.exit(0);
   }
     
-  setImmediate(pollForWork);
-}
-
-const pollForWork = async () => {
-  console.log('Current domain:', CURRENT_DOMAIN);
-  await TaskProtection.acquire();
-  await processEvents(CURRENT_DOMAIN, QUEUE_URL);
-  await delay(5000);
-  await TaskProtection.release();
-  return maybeContinuePolling();
+  setImmediate(pollEvents);
 }
 
 process.on('SIGTERM', () => {
@@ -63,5 +57,3 @@ TaskProtection.on('rejected', (e) => {
 TaskProtection.on('unprotected', (e) => {
   console.log('Task protection released');
 });
-
-setImmediate(pollForWork);

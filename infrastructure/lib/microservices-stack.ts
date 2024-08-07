@@ -19,7 +19,7 @@ export class MicroservicesStack extends cdk.Stack {
     });
 
     const eventProcessorImage = ecs.ContainerImage.fromAsset(
-      '../services/event-processor-services'
+      '../patterns/event-processor-fargate'
     );
 
     const cronJobImage = ecs.ContainerImage.fromAsset(
@@ -27,7 +27,7 @@ export class MicroservicesStack extends cdk.Stack {
     )
 
     // Create domain1 queue service
-    new QueueFargateService(this, 'domain1', {
+    new QueueFargateService(this, 'process-challenges', {
       cluster,
       containerImage: eventProcessorImage,
     });

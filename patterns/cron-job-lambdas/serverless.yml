@@ -9,7 +9,7 @@ provider:
       Action:
         - "sqs:SendMessage"
       Resource: 
-        - Fn::ImportValue: domain1-queueArn
+        - Fn::ImportValue: process-challenges-queueArn
 
 functions:
   domain5:
@@ -22,7 +22,7 @@ functions:
           enabled: false
     environment:
       QUEUE_URL:
-        Fn::ImportValue: domain1-queueUrl
+        Fn::ImportValue: process-challenges-queueUrl
       MONGO_URI: ${env:MONGO_URI}
       RIOT_API_URL: ${env:RIOT_API_URL}
       RIOT_API_KEY: ${env:RIOT_API_KEY}

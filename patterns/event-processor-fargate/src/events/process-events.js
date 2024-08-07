@@ -3,41 +3,23 @@ import {
   ReceiveMessageCommand,
   DeleteMessageCommand,
 } from '@aws-sdk/client-sqs';
-import { processEventDomain1 } from './domain1/index.js';
-import { processEventDomain2 } from './domain2/index.js';
+import { microservices } from '../config/microservices.js';
 
 const sqs = new SQSClient({ region: 'us-east-1'});
 
-const domainsConfig = [
-  {
-    domain: 'domain1',
-    MaxNumberOfMessages: 1,
-    WaitTimeSeconds: 20,
-    VisibilityTimeout: 60 * 60,
-    fn: processEventDomain1,
-  },
-  {
-    domain: 'domain2',
-    MaxNumberOfMessages: 5,
-    WaitTimeSeconds: 20,
-    VisibilityTimeout: 60 * 60,
-    fn: processEventDomain2,
-  },
-];
-
 export const processEvents = async (currentDomain, queueUrl) => {
-  const domain = domainsConfig.find((d) => d.domain === currentDomain);
+  const microservice = microservices.find((d) => d.domain === currentDomain);
 
-  if (!domain) {
-    throw new Error('Invalid domain');
+  if (!microservice) {
+    throw new Error('Invalid microservice');
   }
 
   const receiveMessageResponse = await sqs.send(
     new ReceiveMessageCommand({
       QueueUrl: queueUrl,
-      MaxNumberOfMessages: domain.MaxNumberOfMessages,
-      WaitTimeSeconds: domain.WaitTimeSeconds,
-      VisibilityTimeout: domain.VisibilityTimeout,
+      MaxNumberOfMessages: microservice.MaxNumberOfMessages,
+      WaitTimeSeconds: microservice.WaitTimeSeconds,
+      VisibilityTimeout: microservice.VisibilityTimeout,
     })
   );
 
@@ -50,7 +32,7 @@ export const processEvents = async (currentDomain, queueUrl) => {
   }
 
   const promises = messages.map((message) => {
-    return processMessage(domain.fn, message, queueUrl);
+    return processMessage(microservice.fn, message, queueUrl);
   });
 
   await Promise.all(promises);  
