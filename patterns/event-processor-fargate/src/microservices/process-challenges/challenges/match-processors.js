@@ -3,7 +3,7 @@ export const getPlayedMap = (match) => {
   const lastIndex = mapId.split('/').length - 1;
   const currentMap = mapId.split('/')[lastIndex];
 
-  return currentMap;
+  return currentMap?.toLowerCase();
 };
 
 export const getWinMap = (puuid, match) => {
@@ -43,6 +43,6 @@ export const getKills = (puuid, match) => {
 
 export const getUltimates = (puuid, match) => {
   const player = match.players.find(player => player.puuid === puuid);
-  const ultimateCasts = player.stats.abilityCasts.ultimateCasts;
+  const ultimateCasts = player.stats.abilityCasts?.ultimateCasts;
   return ultimateCasts;
 }
