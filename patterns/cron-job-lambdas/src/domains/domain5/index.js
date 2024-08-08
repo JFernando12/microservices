@@ -5,6 +5,7 @@ import axios from 'axios';
 console.log('Starting Domain 5 cron job...');
 console.log('Processing IDs...');
 
+const NODE_ENV = process.env.NODE_ENV;
 const QUEUE_URL = process.env.QUEUE_URL;
 const MONGO_URI = process.env.MONGO_URI;
 const RIOT_API_KEY = process.env.RIOT_API_KEY
@@ -23,7 +24,9 @@ export const handler = async () => {
     const collection = database.collection('matchToProcess');
 
     // Get IDs to process
-    const ids = await getIdsToProcess();
+    let ids = await getIdsToProcess();
+
+    if (NODE_ENV === 'local') ids = ['1', '2', '3']; // For local testing
     console.log('IDs to process:', ids);
 
     // Step 1: Find non-existing IDs
@@ -104,7 +107,8 @@ const sendBatchToSqs = async (sqsClient, queueUrl, batch) => {
 }
 
 const getIdsToProcess = async () => {
-  const response = await axios.get(RIOT_API_URL, {
+  const queueMatchIdsUrl = `${RIOT_API_URL}/val/match/console/v1/recent-matches/by-queue/console_unrated`;
+  const response = await axios.get(queueMatchIdsUrl, {
     headers: {
       'X-Riot-Token': RIOT_API_KEY,
     },

@@ -11,6 +11,16 @@ provider:
       Resource: 
         - Fn::ImportValue: process-challenges-queueArn
 
+params:
+  default:
+    node_env: development
+  prod:
+    node_env: production
+  dev:
+    node_env: development
+  local:
+    node_env: local
+
 functions:
   domain5:
     runtime: nodejs20.x
@@ -21,6 +31,7 @@ functions:
           rate: rate(3 minutes)
           enabled: false
     environment:
+      NODE_ENV: ${param:node_env}
       QUEUE_URL:
         Fn::ImportValue: process-challenges-queueUrl
       MONGO_URI: ${env:MONGO_URI}
