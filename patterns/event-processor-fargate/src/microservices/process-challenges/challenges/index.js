@@ -74,7 +74,8 @@ export const challeges = async (puuid, match) => {
           type,
           target,
           quantity,
-          challengeId: challengesIds[`${type}-${target}`],
+          id: challengesIds[`${type}-${target}`],
+          slug: `${type}-${target}`,
         }))
     )
     .filter((challenge) => challenge.quantity > 0);

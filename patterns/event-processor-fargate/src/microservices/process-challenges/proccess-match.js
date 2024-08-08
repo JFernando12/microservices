@@ -1,37 +1,53 @@
 import axios from 'axios';
+import { MongoClient } from 'mongodb';
 import { challeges } from './challenges/index.js';
+import { RIOT_API_KEY, RIOT_API_URL } from '../../config/envs.js';
+import { updateChallenges } from './update-challenges.js';
+import { client } from '../../db/mongodb.js';
 
-export const processMatch = async (id, collection) => {
+export const processMatch = async (id) => {
   const match = await getMatch(id);
-
   console.log('Match:', id);
 
-  // Process the match here
-  const puuids = match.players.map(player => player.puuid);
+  const database_challenges = client.db('esports-cms');
 
-  for (const puuid of puuids) {
+  // Get the puuids of the players in the match
+  const puuids = match.players.map((player) => player.puuid);
+  const docs = await database_challenges
+    .collection('challenges_users')
+    .find({ userId: { $in: puuids } })
+    .project({ userId: 1 })
+    .toArray();
+  const puuidsToProcess = docs.map((doc) => doc.userId);
+
+  for (const puuid of puuidsToProcess) {
     const challengesToAdd = await challeges(puuid, match);
     console.log('Challenges to add:', challengesToAdd);
+    await updateChallenges(puuid, challengesToAdd);
   }
 
   // Update the match in the database
-  await collection.updateOne({ matchId: id }, { $set: { processed: true } });
+  const database_sqs = client.db('sqs');
+  await database_sqs.collection('matchToProcess').updateOne(
+    { matchId: id },
+    { $set: { processed: true } }
+  );
   console.log('Match processed:', id);
-}
+};
 
 const getMatch = async (id) => {
-  const RIOT_API_URL = process.env.RIOT_API_URL;
-  const RIOT_API_KEY = process.env.RIOT_API_KEY;
-  
-  const response = await axios.get(`${RIOT_API_URL}/val/match/console/v1/matches/${id}`, {
-    headers: {
-      'X-Riot-Token': RIOT_API_KEY,
-    },
-  });
+  const response = await axios.get(
+    `${RIOT_API_URL}/val/match/console/v1/matches/${id}`,
+    {
+      headers: {
+        'X-Riot-Token': RIOT_API_KEY,
+      },
+    }
+  );
 
   if (response.status !== 200) {
     throw new Error(`Failed to fetch match ${id}`);
   }
 
   return response.data;
-}
+};
