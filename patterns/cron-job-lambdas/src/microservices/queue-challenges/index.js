@@ -26,7 +26,7 @@ export const handler = async () => {
     // Get IDs to process
     let ids = await getIdsToProcess();
 
-    if (NODE_ENV === 'local') ids = ['1', '2', '3']; // For local testing
+    if (NODE_ENV === 'development') ids = ['1', '2', '3']; // For local testing
     console.log('IDs to process:', ids);
 
     // Step 1: Find non-existing IDs

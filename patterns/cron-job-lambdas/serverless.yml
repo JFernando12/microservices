@@ -1,5 +1,13 @@
 service: cron-jobs
 
+params:
+  default:
+    node_env: development
+  prod:
+    node_env: production
+  dev:
+    node_env: development
+
 provider:
   name: aws
   stage: ${opt:stage, 'dev'}
@@ -11,21 +19,11 @@ provider:
       Resource: 
         - Fn::ImportValue: process-challenges-queueArn
 
-params:
-  default:
-    node_env: development
-  prod:
-    node_env: production
-  dev:
-    node_env: development
-  local:
-    node_env: local
-
 functions:
   domain5:
     runtime: nodejs20.x
     timeout: 29
-    handler: ./src/domains/domain5/index.handler
+    handler: ./src/microservices/queue-challenges/index.handler
     events:
       - schedule:
           rate: rate(3 minutes)
