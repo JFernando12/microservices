@@ -14,7 +14,7 @@ export const challeges = async (puuid, match) => {
   const challengesIds = {
     'playedMap-abyss': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b3b',
     'playedMap-ascend': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b3c',
-    'playedMap-bind': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b3d',
+    'category-game-type-target': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b3d',
     'playedMap-haven': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b3e',
     'playedMap-sunset': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b3f',
     'winMap-abyss': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b4',
