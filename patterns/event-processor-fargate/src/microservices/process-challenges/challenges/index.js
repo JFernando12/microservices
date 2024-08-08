@@ -9,6 +9,7 @@ import {
 
 export const challeges = async (puuid, match) => {
   const matchId = match.matchInfo.matchId;
+  console.log('Match::', matchId);
 
   const challengesIds = {
     'playedMap-abyss': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b3b',

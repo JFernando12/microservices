@@ -13,17 +13,18 @@ export const processMatch = async (id) => {
 
   // Get the puuids of the players in the match
   const puuids = match.players.map((player) => player.puuid);
-  const docs = await database_challenges
-    .collection('challenges_users')
-    .find({ userId: { $in: puuids } })
-    .project({ userId: 1 })
-    .toArray();
-  const puuidsToProcess = docs.map((doc) => doc.userId);
+  const puuidsToProcess = puuids;
+  // const docs = await database_challenges
+  //   .collection('challenges_users')
+  //   .find({ userId: { $in: puuids } })
+  //   .project({ userId: 1 })
+  //   .toArray();
+  // const puuidsToProcess = docs.map((doc) => doc.userId);
 
   for (const puuid of puuidsToProcess) {
     const challengesToAdd = await challeges(puuid, match);
     console.log('Challenges to add:', challengesToAdd);
-    await updateChallenges(puuid, challengesToAdd);
+    // await updateChallenges(puuid, challengesToAdd);
   }
 
   // Update the match in the database

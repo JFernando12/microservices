@@ -1,4 +1,4 @@
-import { client } from '../../db/mongodb';
+import { client } from '../../db/mongodb.js';
 
 export const updateChallenges = async (puuid, challenges) => {
   // Get existing challenges, user.challenges, is an array of objects
