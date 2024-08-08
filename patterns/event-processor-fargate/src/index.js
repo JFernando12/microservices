@@ -9,15 +9,14 @@ const main = async () => {
   await client.connect();
   console.log('Connected to MongoDB');
 
-
   if (NODE_ENV === 'development') {
     console.log('Running in development mode');
     const microservice = microservices.find((microservice) => microservice.development);
     if (microservice) await microservice.fn(microservice.devData);
-    return;
+  } else {
+    console.log('Running in production mode');
+    await pollEvents();
   }
-
-  await pollEvents();
 
   await client.close();
 }

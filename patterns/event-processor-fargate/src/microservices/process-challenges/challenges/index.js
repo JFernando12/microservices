@@ -11,29 +11,6 @@ export const challeges = async (puuid, match) => {
   const matchId = match.matchInfo.matchId;
   console.log('Match::', matchId);
 
-  const challengesIds = {
-    'playedMap-abyss': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b3b',
-    'playedMap-ascend': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b3c',
-    'category-game-type-target': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b3d',
-    'playedMap-haven': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b3e',
-    'playedMap-sunset': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b3f',
-    'winMap-abyss': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b4',
-    'winMap-ascend': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b5',
-    'winMap-bind': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b6',
-    'winMap-haven': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b7',
-    'winMap-sunset': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b8',
-    'playedAgent-brimstone': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3b9',
-    'playedAgent-viper': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3ba',
-    'playedAgent-omen': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3bb',
-    'winAgent-brimstone': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3bc',
-    'winAgent-viper': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3bd',
-    'winAgent-omen': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3be',
-    'winTime-30': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3bf',
-    'winTime-45': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3c0',
-    'stats-kills': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3c1',
-    'stats-ultimates': 'd1b3b3b3-4b1b-4f3b-8b3b-3b3b3b3b3c2',
-  };
-
   const playedMap = getPlayedMap(match);
   const win = getWinMap(puuid, match);
   const playedAgent = await getPlayedAgent(puuid, match);
@@ -75,8 +52,6 @@ export const challeges = async (puuid, match) => {
           type,
           target,
           quantity,
-          id: challengesIds[`${type}-${target}`],
-          slug: `${type}-${target}`,
         }))
     )
     .filter((challenge) => challenge.quantity > 0);

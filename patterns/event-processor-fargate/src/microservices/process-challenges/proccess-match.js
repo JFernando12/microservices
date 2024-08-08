@@ -1,7 +1,6 @@
 import axios from 'axios';
-import { MongoClient } from 'mongodb';
 import { challeges } from './challenges/index.js';
-import { RIOT_API_KEY, RIOT_API_URL } from '../../config/envs.js';
+import { NODE_ENV, RIOT_API_KEY, RIOT_API_URL } from '../../config/envs.js';
 import { updateChallenges } from './update-challenges.js';
 import { client } from '../../db/mongodb.js';
 
@@ -13,13 +12,14 @@ export const processMatch = async (id) => {
 
   // Get the puuids of the players in the match
   const puuids = match.players.map((player) => player.puuid);
-  const puuidsToProcess = puuids;
-  // const docs = await database_challenges
-  //   .collection('challenges_users')
-  //   .find({ userId: { $in: puuids } })
-  //   .project({ userId: 1 })
-  //   .toArray();
-  // const puuidsToProcess = docs.map((doc) => doc.userId);
+  const docs = await database_challenges
+    .collection('challenges_users')
+    .find({ userId: { $in: puuids } })
+    .project({ userId: 1 })
+    .toArray();
+  let puuidsToProcess = docs.map((doc) => doc.userId);
+
+  if (NODE_ENV === 'development') puuidsToProcess = puuids;
 
   for (const puuid of puuidsToProcess) {
     const challengesToAdd = await challeges(puuid, match);

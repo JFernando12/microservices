@@ -7,17 +7,14 @@ export const processChallenges = async (data) => {
 
   const database_sqs = client.db('sqs');
 
-  let idsToProcess = [];
-  if (NODE_ENV === 'development') {
-    idsToProcess = ids;
-  } else {
-    const docs = await database_sqs
-      .collection('matchToProcess')
-      .find({ matchId: { $in: ids }, processed: false, needToProcess: true })
-      .project({ matchId: 1 })
-      .toArray();
-    idsToProcess = docs.map((doc) => doc.matchId);
-  }
+  const docs = await database_sqs
+    .collection('matchToProcess')
+    .find({ matchId: { $in: ids }, processed: false, needToProcess: true })
+    .project({ matchId: 1 })
+    .toArray();
+  let idsToProcess = docs.map((doc) => doc.matchId);
+
+  if (NODE_ENV === 'development') idsToProcess = ids;
 
   const promises = idsToProcess.map((id) => processMatch(id));
 
