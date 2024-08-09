@@ -45,7 +45,7 @@ const processMessage = async (fn, message, queueUrl) => {
 
   try {
     await fn(body);
-
+    
     await sqs.send(
       new DeleteMessageCommand({
         QueueUrl: queueUrl,

@@ -10,8 +10,8 @@ export class MicroservicesStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const vpc = ec2.Vpc.fromLookup(this, 'MyVpc', {
-      vpcId: 'vpc-09f158882005f3bb9',
+    const vpc = new ec2.Vpc(this, 'MyVpc', {
+      maxAzs: 1, // Default is all AZs in region
     });
 
     const cluster = new ecs.Cluster(this, 'MyCluster', {

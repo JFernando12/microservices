@@ -31,13 +31,10 @@ export const challeges = async (puuid, match) => {
     winAgent: {
       [playedAgent]: { quantity: win ? 1 : 0 },
     },
-    winTime: {
-      30: { quantity: win && playedTime < 30 ? 1 : 0 },
-      45: { quantity: win && playedTime < 45 ? 1 : 0 },
-    },
     stats: {
       kills: { quantity: kills },
       ultimates: { quantity: ultimates },
+      winTime45: { quantity: win && playedTime < 45 ? 1 : 0 }
     },
   };
 

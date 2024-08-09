@@ -3,10 +3,13 @@ service: cron-jobs
 params:
   default:
     node_env: development
+    cron_enabled: false
   prod:
     node_env: production
+    cron_enabled: true
   dev:
     node_env: development
+    cron_enabled: false
 
 provider:
   name: aws
@@ -20,14 +23,14 @@ provider:
         - Fn::ImportValue: process-challenges-queueArn
 
 functions:
-  domain5:
+  queue-challenges:
     runtime: nodejs20.x
     timeout: 29
     handler: ./src/microservices/queue-challenges/index.handler
     events:
       - schedule:
           rate: rate(3 minutes)
-          enabled: false
+          enabled: ${param:cron_enabled}
     environment:
       NODE_ENV: ${param:node_env}
       QUEUE_URL:

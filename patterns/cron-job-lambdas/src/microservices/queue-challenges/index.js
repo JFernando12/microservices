@@ -11,6 +11,8 @@ const MONGO_URI = process.env.MONGO_URI;
 const RIOT_API_KEY = process.env.RIOT_API_KEY
 const RIOT_API_URL = process.env.RIOT_API_URL;
 
+console.log('NODE_ENV:', NODE_ENV);
+
 export const handler = async () => {
   const client = new MongoClient(MONGO_URI,  {});
 
@@ -20,13 +22,20 @@ export const handler = async () => {
   try {
     // Connect to MongoDB
     await client.connect();
-    const database = client.db('test');
+    const database = client.db('sqs');
     const collection = database.collection('matchToProcess');
 
     // Get IDs to process
     let ids = await getIdsToProcess();
 
-    if (NODE_ENV === 'development') ids = ['1', '2', '3']; // For local testing
+    if (NODE_ENV === 'development') ids = [
+      '298965f3-e25b-4728-af47-638aed2e0cf4',
+      '2dea7196-9a0e-418a-94d7-ccabe251684c',
+      '44c54e30-88f7-4f78-8e35-13a4c260a19b',
+      '03ccbbbc-ad01-4379-8921-812c5969e4e1',
+      '210b1eb6-344d-417c-af90-bdfa804bb9f4',
+    ]; // For local testing
+
     console.log('IDs to process:', ids);
 
     // Step 1: Find non-existing IDs

@@ -24,7 +24,7 @@ export const processMatch = async (id) => {
   for (const puuid of puuidsToProcess) {
     const challengesToAdd = await challeges(puuid, match);
     console.log('Challenges to add:', challengesToAdd);
-    // await updateChallenges(puuid, challengesToAdd);
+    await updateChallenges(puuid, challengesToAdd);
   }
 
   // Update the match in the database

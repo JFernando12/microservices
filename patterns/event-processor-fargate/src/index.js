@@ -21,4 +21,8 @@ const main = async () => {
   await client.close();
 }
 
-main();
+main().then(() => {
+  console.log('Event processor finished');
+}).catch((error) => {
+  console.error('Event processor failed:', error);
+});

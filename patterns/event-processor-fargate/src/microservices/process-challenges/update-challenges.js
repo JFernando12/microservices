@@ -9,10 +9,11 @@ export const updateChallenges = async (puuid, challenges) => {
 
   // { challengeId: string, progress: number }[]
   const existingChallenges = user?.challenges;
-  const challengesIds = challenges.map((c) => c._id);
+  const challengesIds = existingChallenges.map((c) => c.challengeId);
+  console.log('Challenges Ids:', challengesIds);
 
   // { _id: string, type: string, target: string }[]
-  const challegeItems = database_challenges
+  const challengeItems = await database_challenges
     .collection('challenges_items')
     .find({ _id: { $in: challengesIds } })
     .project({ _id: 1, type: 1, target: 1 })
@@ -21,7 +22,7 @@ export const updateChallenges = async (puuid, challenges) => {
   // challenges: { type: string, target: string, quantity: number }[],
   // Update the challenges, sum the quantity to the progress
   const challengesWithId = challenges.map((c) => {
-    const challengeItem = challegeItems.find((ct) => {
+    const challengeItem = challengeItems.find((ct) => {
       return ct.type === c.type && ct.target === c.target
     });
 
@@ -32,7 +33,6 @@ export const updateChallenges = async (puuid, challenges) => {
       id: challengeItem._id,
     };
   }).filter((c) => c);
-  console.log('Challenges updated:', challengesUpdated);
 
   // Update the user challenges
   const challengesUpdated = existingChallenges.map((ec) => {
@@ -43,6 +43,7 @@ export const updateChallenges = async (puuid, challenges) => {
       progress: ec.progress + challenge.quantity,
     };
   });
+  console.log('Challenges updated:', challengesUpdated);
 
   await database_challenges
     .collection('challenges_users')

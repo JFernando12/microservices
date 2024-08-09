@@ -16,6 +16,8 @@ export const processChallenges = async (data) => {
 
   if (NODE_ENV === 'development') idsToProcess = ids;
 
+  console.log('Matches to process:', idsToProcess);
+
   const promises = idsToProcess.map((id) => processMatch(id));
 
   await Promise.all(promises);
