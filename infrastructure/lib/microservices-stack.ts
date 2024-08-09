@@ -11,7 +11,7 @@ export class MicroservicesStack extends cdk.Stack {
     super(scope, id, props);
 
     const vpc = ec2.Vpc.fromLookup(this, 'MyVpc', {
-      vpcId: 'vpc-09f158882005f3bb9'
+      vpcId: 'vpc-09f158882005f3bb9',
     });
 
     const cluster = new ecs.Cluster(this, 'MyCluster', {
