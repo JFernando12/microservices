@@ -18,25 +18,47 @@ export const challeges = async (puuid, match) => {
   const kills = getKills(puuid, match);
   const ultimates = getUltimates(puuid, match);
 
+  // Game - type - target - objective
+  // const challengesData = {
+  //   playedAgent: {
+  //     [playedAgent]: { quantity: 1 },
+  //   },
+  //   winAgent: {
+  //     [playedAgent]: { quantity: win ? 1 : 0 },
+  //   },
+  //   stats: {
+  //     kills: { quantity: kills },
+  //     ultimates: { quantity: ultimates },
+  //     winTime45: { quantity: win && playedTime < 45 ? 1 : 0 }
+  //   },
+  // };
   const challengesData = {
-    playedMap: {
-      [playedMap]: { quantity: 1 },
-    },
-    winMap: {
-      [playedMap]: { quantity: win ? 1 : 0 },
-    },
-    playedAgent: {
-      [playedAgent]: { quantity: 1 },
-    },
-    winAgent: {
-      [playedAgent]: { quantity: win ? 1 : 0 },
-    },
-    stats: {
-      kills: { quantity: kills },
-      ultimates: { quantity: ultimates },
-      winTime45: { quantity: win && playedTime < 45 ? 1 : 0 }
-    },
-  };
+    valorant: {
+      map: {
+        [playedMap]: {
+          played: { quantity: 1 },
+          win: { quantity: win ? 1 : 0 },
+        }
+      },
+      agent: {
+        [playedAgent]: {
+          played: { quantity: 1 },
+          win: { quantity: win ? 1 : 0 },
+        }
+      },
+      stats: {
+        kills: {
+          na: { quantity: kills },
+        },
+        ultimates: {
+          na: { quantity: ultimates },
+        },
+        winTime45: {
+          na: { quantity: win && playedTime < 45 ? 1 : 0 }
+        }
+      }
+    }
+  }
 
   // Convert to the desired format and filter in one step using flatMap
   const challengesToAdd = Object.entries(challengesData)
