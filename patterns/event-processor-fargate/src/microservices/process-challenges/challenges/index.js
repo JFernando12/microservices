@@ -48,13 +48,13 @@ export const challeges = async (puuid, match) => {
       },
       stats: {
         kills: {
-          na: { quantity: kills },
+          x: { quantity: kills },
         },
         ultimates: {
-          na: { quantity: ultimates },
+          x: { quantity: ultimates },
         },
         winTime45: {
-          na: { quantity: win && playedTime < 45 ? 1 : 0 }
+          x: { quantity: win && playedTime < 45 ? 1 : 0 }
         }
       }
     }
