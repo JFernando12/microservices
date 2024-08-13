@@ -38,11 +38,11 @@ export const getPlayedTime = (match) => {
 export const getKills = (puuid, match) => {
   const player = match.players.find(player => player.puuid === puuid);
   const kills = player.stats.kills;
-  return kills;
+  return kills || 0;
 }
 
 export const getUltimates = (puuid, match) => {
   const player = match.players.find(player => player.puuid === puuid);
   const ultimateCasts = player.stats.abilityCasts?.ultimateCasts;
-  return ultimateCasts;
+  return ultimateCasts || 0;
 }

@@ -7,6 +7,16 @@ import {
   getUltimates,
 } from './match-processors.js';
 
+const formatValue = (value) => {
+  if (value === 'undefined') return undefined;
+  if (value === 'x') return null;
+  if (typeof value === 'number' && value === 0) return undefined;
+  if (typeof 'string' && value === '') return undefined;
+  if (typeof value === 'string') return value.toLowerCase();
+
+  return value;
+};
+
 export const challeges = async (puuid, match) => {
   const matchId = match.matchInfo.matchId;
   console.log('Match::', matchId);
@@ -19,32 +29,19 @@ export const challeges = async (puuid, match) => {
   const ultimates = getUltimates(puuid, match);
 
   // Game - type - target - objective
-  // const challengesData = {
-  //   playedAgent: {
-  //     [playedAgent]: { quantity: 1 },
-  //   },
-  //   winAgent: {
-  //     [playedAgent]: { quantity: win ? 1 : 0 },
-  //   },
-  //   stats: {
-  //     kills: { quantity: kills },
-  //     ultimates: { quantity: ultimates },
-  //     winTime45: { quantity: win && playedTime < 45 ? 1 : 0 }
-  //   },
-  // };
   const challengesData = {
     valorant: {
       map: {
         [playedMap]: {
           played: { quantity: 1 },
           win: { quantity: win ? 1 : 0 },
-        }
+        },
       },
       agent: {
         [playedAgent]: {
           played: { quantity: 1 },
           win: { quantity: win ? 1 : 0 },
-        }
+        },
       },
       stats: {
         kills: {
@@ -54,28 +51,36 @@ export const challeges = async (puuid, match) => {
           x: { quantity: ultimates },
         },
         winTime45: {
-          x: { quantity: win && playedTime < 45 ? 1 : 0 }
-        }
-      }
-    }
-  }
+          x: { quantity: win && playedTime < 45 ? 1 : 0 },
+        },
+      },
+    },
+  };
 
-  // Convert to the desired format and filter in one step using flatMap
-  const challengesToAdd = Object.entries(challengesData)
-    .flatMap(([type, targets]) =>
-      Object.entries(targets)
-        .filter(([target]) => target != 'undefined')
-        .map(([target, { quantity }]) => ({
-          puuid,
-          matchId,
-          type,
-          target,
-          quantity,
-        }))
-    )
-    .filter((challenge) => challenge.quantity > 0);
+  const challengesConvertion = [];
+  Object.entries(challengesData).forEach(([game, types]) => {
+    Object.entries(types).forEach(([type, targets]) => {
+      Object.entries(targets).forEach(([target, objectives]) => {
+        Object.entries(objectives).forEach(([objective, data]) => {
+          challengesConvertion.push({
+            matchId: matchId,
+            puuid: puuid,
+            game: formatValue(game),
+            type: formatValue(type),
+            target: formatValue(target),
+            objective: formatValue(objective),
+            quantity: formatValue(data.quantity),
+          });
+        });
+      });
+    });
+  });
 
-  console.log('Challenges to add:', challengesToAdd);
+  const response =challengesConvertion.filter((c) =>
+    !Object.values(c).some(value => value === undefined)
+  );
 
-  return challengesToAdd;
+  console.log('Challenges to add:', response);
+
+  return response;
 };

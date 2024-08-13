@@ -9,6 +9,12 @@ export const updateChallenges = async (puuid, challenges) => {
 
   // { challengeId: string, progress: number }[]
   const existingChallenges = user?.challenges;
+
+  if (!existingChallenges) {
+    console.log('User challenges not found');
+    return;
+  }
+
   const challengesIds = existingChallenges.map((c) => c.challengeId);
   console.log('Challenges Ids:', challengesIds);
 
