@@ -29,7 +29,7 @@ export const updateChallenges = async (puuid, challenges) => {
   // Update the challenges, sum the quantity to the progress
   const challengesWithId = challenges.map((c) => {
     const challengeItem = challengeItems.find((ct) => {
-      return ct.type === c.type && ct.target === c.target
+      return ct.game === c.game && ct.type === c.type && ct.target === c.target && ct.objective === c.objective;
     });
 
     if (!challengeItem) return null;
