@@ -27,7 +27,7 @@ export class MicroservicesStack extends cdk.Stack {
     )
 
     // Create domain1 queue service
-    new QueueFargateService(this, 'process-challenges', {
+    new QueueFargateService(this, 'domain1', {
       cluster,
       containerImage: eventProcessorImage,
     });
